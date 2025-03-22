@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Cup Highlights</title>
+<link rel="icon" href="https://static.readdy.ai/image/b49161e4a6ff18a3f3d9936258a979d1/5c51ff2a3bf221c00fae4a6485c66c82.png" type="image/png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#2A3C55',
+secondary: '#8294A5'
+},
+borderRadius: {
+'none': '0px',
+'sm': '8px',
+DEFAULT: '12px',
+'md': '16px',
+'lg': '20px',
+'xl': '24px',
+'2xl': '28px',
+'3xl': '32px',
+'full': '9999px',
+'button': '12px'
+}
+}
+}
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.161.0/three.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+canvas {
+opacity: 0.3;
+filter: blur(2px);
+background: transparent;
+}
+.custom-cursor {
+width: 20px;
+height: 20px;
+position: fixed;
+pointer-events: none;
+z-index: 9999;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.2);
+backdrop-filter: blur(2px);
+border: 2px solid rgba(255, 255, 255, 0.8);
+transform: translate(-50%, -50%);
+transition: width 0.3s, height 0.3s, background-color 0.3s;
+mix-blend-mode: difference;
+will-change: transform;
+}
+@keyframes cursorPulse {
+0% {
+transform: translate(-50%, -50%) scale(1);
+}
+50% {
+transform: translate(-50%, -50%) scale(1.2);
+}
+100% {
+transform: translate(-50%, -50%) scale(1);
+}
+}
+@keyframes gradient {
+0% {
+background-position: 0% 50%;
+}
+50% {
+background-position: 100% 50%;
+}
+100% {
+background-position: 0% 50%;
+}
+}
+.animate-gradient {
+background: linear-gradient(270deg, #60a5fa, #8b5cf6, #ec4899);
+background-size: 200% 200%;
+animation: gradient 3s ease infinite;
+}
+.quote-card {
+transition: all 0.3s ease;
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.quote-card:hover {
+box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+transform: translateY(-10px);
+}
+.cursor-hover {
+width: 40px;
+height: 40px;
+background: rgba(255, 255, 255, 0.3);
+border-color: rgba(255, 255, 255, 1);
+}
+.parallax-section {
+position: relative;
+height: 100vh;
+overflow: hidden;
+}
+.mountain-bg {
+position: absolute;
+width: 100%;
+height: 100%;
+background-size: cover;
+background-position: center;
+will-change: transform;
+}
+.scroll-indicator {
+position: absolute;
+bottom: 40px;
+left: 50%;
+transform: translateX(-50%);
+animation: bounce 2s infinite;
+}
+@keyframes bounce {
+0%, 20%, 50%, 80%, 100% {
+transform: translateY(0);
+}
+40% {
+transform: translateY(-30px);
+}
+60% {
+transform: translateY(-15px);
+}
+}
+.progress-bar {
+position: fixed;
+top: 0;
+left: 0;
+width: 0%;
+height: 3px;
+background: linear-gradient(to right, #2A3C55, #8294A5);
+z-index: 9999;
+}
+</style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+<div class="custom-cursor"></div>
+<div class="progress-bar"></div>
+<nav class="fixed top-0 w-full bg-gray-800/80 backdrop-blur-md z-50">
+<div class="container mx-auto px-6 py-4">
+<div class="flex items-center justify-between">
+<a href="#" class="flex items-center">
+<img src="https://static.readdy.ai/image/b49161e4a6ff18a3f3d9936258a979d1/5c51ff2a3bf221c00fae4a6485c66c82.png" alt="logo" class="h-8 w-8 mr-2">
+<span class="text-2xl font-['Pacifico'] text-gray-100">FIFA World Cup</span>
+</a>
+<div class="hidden md:flex space-x-8">
+<a href="#home" class="hover:text-primary transition-colors">Home</a>
+<a href="#about" class="hover:text-primary transition-colors">About</a>
+<a href="#gallery" class="hover:text-primary transition-colors">Gallery</a>
+<a href="#contact" class="hover:text-primary transition-colors">Contact Us</a>
+</div>
+<button class="md:hidden" id="menu-btn">
+<i class="ri-menu-line text-2xl"></i>
+</button>
+</div>
+</div>
+</nav>
+<section id="home" class="parallax-section">
+<div class="mountain-bg" style="background-image: url('https://public.readdy.ai/ai/img_res/a7132abac84c95af31cc51dfbd7ce37e.jpg')"></div>
+<div class="absolute inset-0 flex items-center justify-center text-center">
+<div class="space-y-6">
+<h1 class="text-6xl font-bold leading-tight animate-gradient bg-clip-text text-transparent font-['KaiTi'] mb-8">World Cup Passion Unleashed</h1>
+<p class="text-xl animate-gradient bg-clip-text text-transparent font-['KaiTi']">Witness the Glorious Moments of Football's Highest Stage</p>
+<button class="bg-primary hover:bg-opacity-90 text-white px-8 py-3 rounded-button animate-pulse">Explore the Event</button>
+</div>
+</div>
+<div class="scroll-indicator">
+<i class="ri-arrow-down-line text-3xl animate-bounce"></i>
+</div>
+</section>
+<section id="quotes" class="py-20 bg-gray-900 overflow-hidden">
+<div class="container mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<div class="quote-card p-8 bg-gray-800 rounded-lg transform hover:scale-105 transition-transform duration-500" data-aos="fade-right">
+<img src="https://public.readdy.ai/ai/img_res/d7818f2e8b2ed0d2d68e1d2b9aa5b063.jpg" alt="Maracanã Stadium" class="w-full h-48 object-cover rounded-lg mb-6">
+<p class="text-gray-300 font-['KaiTi'] leading-relaxed animate-gradient bg-clip-text text-transparent">Under the night sky, Maracanã welcomed its second World Cup final. The Christ the Redeemer atop Corcovado overlooks the hustle and bustle of the world, gazing down upon all beings. In His eyes, perhaps all the joys and sorrows are insignificant. But we, living in this mortal world, experience immense emotional waves with every World Cup.</p>
+</div>
+<div class="quote-card p-8 bg-gray-800 rounded-lg transform hover:scale-105 transition-transform duration-500" data-aos="fade-left">
+<img src="https://public.readdy.ai/ai/img_res/e464a23d7fd3c96b3bfd85f03910dd64.jpg" alt="Spain Team" class="w-full h-48 object-cover rounded-lg mb-6">
+<p class="text-gray-300 font-['KaiTi'] leading-relaxed animate-gradient bg-clip-text text-transparent">Romain Rolland once said that there is only one true heroism in this world: to see the truth of life and still love it. Spain team, start anew! Isn’t the path of climbing upward more exhilarating than standing at the peak?</p>
+</div>
+<div class="quote-card p-8 bg-gray-800 rounded-lg transform hover:scale-105 transition-transform duration-500" data-aos="fade-right">
+<img src="https://public.readdy.ai/ai/img_res/ce23a34bd0a364c7579a723663c1a22f.jpg" alt="Ronaldo Training" class="w-full h-48 object-cover rounded-lg mb-6">
+<p class="text-gray-300 font-['KaiTi'] leading-relaxed animate-gradient bg-clip-text text-transparent">Excluding sleep, a person’s life is only about 16,000 days. The difference between people lies in whether you’ve lived 16,000 days or lived one day repeated 16,000 times. I believe every day for Ronaldo is a fresh start.</p>
+</div>
+<div class="quote-card p-8 bg-gray-800 rounded-lg transform hover:scale-105 transition-transform duration-500" data-aos="fade-left">
+<img src="https://public.readdy.ai/ai/img_res/f7a69b7ad4157f763bf1b665cbbe0212.jpg" alt="USA-Canada-Mexico Scenery" class="w-full h-48 object-cover rounded-lg mb-6">
+<p class="text-gray-300 font-['KaiTi'] leading-relaxed animate-gradient bg-clip-text text-transparent">The story of the Persian Gulf has concluded. Four years from now, let us meet at the Rocky Mountains, Niagara Falls, and the Yucatán Peninsula. Let’s gather where the Mayan civilization once thrived. Dear viewers, see you again at the USA-Canada-Mexico World Cup in four years.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="about" class="py-20 bg-gray-800">
+<div class="container mx-auto px-6">
+<div class="grid md:grid-cols-2 gap-12 items-center">
+<div class="space-y-6">
+<h2 class="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent font-['KaiTi'] mb-8">About the World Cup</h2>
+<p class="text-gray-300 font-['KaiTi'] leading-relaxed">The World Cup is the most influential football event globally, witnessing countless legendary moments. Since the inaugural tournament in Uruguay in 1930, this event has become the ultimate stage for showcasing human sporting spirit. Held every four years, the World Cup is not only a sports extravaganza but also a bridge for cultural exchange among nations.</p>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-gray-700 rounded-lg text-center">
+<h3 class="text-2xl font-bold">22</h3>
+<p class="text-sm text-gray-300">Exciting Tournaments</p>
+</div>
+<div class="p-4 bg-gray-700 rounded-lg text-center">
+<h3 class="text-2xl font-bold">32</h3>
+<p class="text-sm text-gray-300">Participating Teams</p>
+</div>
+</div>
+</div>
+<div class="relative h-96">
+<img src="https://public.readdy.ai/ai/img_res/f99aed7fc0aead6a6e058b95850ae270.jpg" alt="World Cup Trophy" class="w-full h-full object-cover rounded-lg">
+</div>
+</div>
+</div>
+</section>
+<section id="gallery" class="py-20 bg-gray-900">
+<div class="container mx-auto px-6">
+<h2 class="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent font-['KaiTi']">World Cup Classic Moments</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="gallery-item overflow-hidden rounded-lg">
+<img src="https://public.readdy.ai/ai/img_res/5216abc5df3a89f4c113dbc8b65e31fd.jpg" alt="Messi Wins" class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500">
+<p class="mt-4 text-center text-gray-300 font-['KaiTi']">Argentina Wins the 2022 Qatar World Cup</p>
+</div>
+<div class="gallery-item overflow-hidden rounded-lg">
+<img src="https://public.readdy.ai/ai/img_res/a969aa638fd2bf6bee47c62abc656f1f.jpg" alt="Match Moment" class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500">
+<p class="mt-4 text-center text-gray-300 font-['KaiTi']">Intense Match Scene</p>
+</div>
+<div class="gallery-item overflow-hidden rounded-lg">
+<img src="https://public.readdy.ai/ai/img_res/6143d204ef1df81223e2538bae4802a3.jpg" alt="Fans Celebrating" class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500">
+<p class="mt-4 text-center text-gray-300 font-['KaiTi']">Passionate Fans Cheering On-Site</p>
+</div>
+</div>
+</div>
+</section>
+<section id="contact" class="py-20 bg-gradient-to-b from-gray-800 via-gray-400 to-white transition-all duration-1000">
+    <div class="container mx-auto px-6">
+      <div class="max-w-2xl mx-auto">
+        <h2 class="text-4xl font-bold text-center mb-16 text-gray-100 font-['KaiTi']">made by</h2>
+        <div class="rounded-lg overflow-hidden">
+          <img src="https://static.readdy.ai/image/b49161e4a6ff18a3f3d9936258a979d1/b65dfe98e590027d7b0b3a71b7e03dc7.png" alt="Contact Us" class="w-full h-auto">
+        </div>
+      </div>
+    </div>
+  </section>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const particlesCount = 50;
+const colors = ['#60a5fa', '#8b5cf6', '#ec4899'];
+const particles = [];
+class Particle {
+constructor() {
+this.x = Math.random() * window.innerWidth;
+this.y = Math.random() * window.innerHeight;
+this.size = Math.random() * 5 + 1;
+this.baseX = this.x;
+this.baseY = this.y;
+this.density = (Math.random() * 30) + 1;
+this.color = colors[Math.floor(Math.random() * colors.length)];
+}
+update(mouseX, mouseY) {
+let dx = mouseX - this.x;
+let dy = mouseY - this.y;
+let distance = Math.sqrt(dx * dx + dy * dy);
+let forceDirectionX = dx / distance;
+let forceDirectionY = dy / distance;
+let maxDistance = 100;
+let force = (maxDistance - distance) / maxDistance;
+let directionX = forceDirectionX * force * this.density;
+let directionY = forceDirectionY * force * this.density;
+if (distance < maxDistance) {
+this.x -= directionX;
+this.y -= directionY;
+} else {
+if (this.x !== this.baseX) {
+let dx = this.x - this.baseX;
+this.x -= dx/10;
+}
+if (this.y !== this.baseY) {
+let dy = this.y - this.baseY;
+this.y -= dy/10;
+}
+}
+}
+draw(ctx) {
+ctx.fillStyle = this.color;
+ctx.beginPath();
+ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+ctx.fill();
+}
+}
+const canvas = document.createElement('canvas');
+canvas.style.position = 'fixed';
+canvas.style.top = '0';
+canvas.style.left = '0';
+canvas.style.width = '100%';
+canvas.style.height = '100%';
+canvas.style.pointerEvents = 'none';
+canvas.style.zIndex = '1';
+document.body.appendChild(canvas);
+function resizeCanvas() {
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+const ctx = canvas.getContext('2d');
+for(let i = 0; i < particlesCount; i++) {
+particles.push(new Particle());
+}
+function animate() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+particles.forEach(particle => {
+particle.update(mouseX, mouseY);
+particle.draw(ctx);
+});
+requestAnimationFrame(animate);
+}
+animate();
+let mouseX = 0;
+let mouseY = 0;
+const cursor = document.querySelector('.custom-cursor');
+document.addEventListener('mousemove', (e) => {
+cursor.style.left = e.clientX + 'px';
+cursor.style.top = e.clientY + 'px';
+mouseX = e.clientX;
+mouseY = e.clientY;
+});
+gsap.utils.toArray('.quote-card').forEach(card => {
+gsap.from(card, {
+opacity: 0,
+y: 100,
+duration: 1,
+scrollTrigger: {
+trigger: card,
+start: 'top bottom-=100',
+toggleActions: 'play none none reverse'
+}
+});
+});
+const tl = gsap.timeline({
+scrollTrigger: {
+trigger: '.mountain-bg',
+start: 'top top',
+end: 'bottom top',
+scrub: 1
+}
+});
+tl.to('.mountain-bg', {
+scale: 1.2,
+y: '20%',
+ease: 'none'
+});
+document.querySelectorAll('a, button').forEach(element => {
+element.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
+element.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
+});
+gsap.to('.mountain-bg', {
+yPercent: 50,
+ease: "none",
+scrollTrigger: {
+trigger: ".parallax-section",
+start: "top top",
+end: "bottom top",
+scrub: true
+}
+});
+gsap.from('.gallery-item', {
+opacity: 0,
+y: 100,
+duration: 1,
+stagger: 0.2,
+scrollTrigger: {
+trigger: "#gallery",
+start: "top center"
+}
+});
+window.addEventListener('scroll', () => {
+const scrolled = (window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+document.querySelector('.progress-bar').style.width = scrolled + '%';
+});
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.querySelector('.parallax-section').appendChild(renderer.domElement);
+const geometry = new THREE.BoxGeometry();
+const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+camera.position.z = 5;
+function animate() {
+requestAnimationFrame(animate);
+cube.rotation.x += 0.01;
+cube.rotation.y += 0.01;
+renderer.render(scene, camera);
+}
+animate();
+window.addEventListener('scroll', () => {
+  const contactSection = document.querySelector('#contact');
+  const rect = contactSection.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+  if (rect.top <= windowHeight && rect.bottom >= 0) {
+    const progress = 1 - (rect.top / windowHeight);
+    contactSection.style.background = `linear-gradient(to top, #1F2937, hsl(210, 20%, ${50 + progress * 20}%))`;
+  }
+});
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92459123cc89afa4',t:'MTc0MjY0NTIyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
